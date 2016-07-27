@@ -225,7 +225,7 @@ class AccountBankStatementImport(models.TransientModel):
     def _find_bank_account_id(self, account_number):
         """ Get res.partner.bank ID """
         bank_account_id = None
-        if account_number and len(account_number) > 4:
+        if account_number and len(str(account_number)) > 4:
             bank_account_ids = self.env['res.partner.bank'].search(
                 [('acc_number', '=', account_number)], limit=1)
             if bank_account_ids:
