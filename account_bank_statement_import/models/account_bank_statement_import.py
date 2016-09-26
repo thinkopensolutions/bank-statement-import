@@ -127,8 +127,10 @@ class AccountBankStatementImport(models.TransientModel):
             if statement_id:
                 statement_ids.append(statement_id)
             notifications.extend(new_notifications)
-        if len(statement_ids) == 0:
-            raise UserError(_('You have already imported that file.'))
+        # import file even without statement ids
+        # it can have cnab lines even if no valid transaction
+        # if len(statement_ids) == 0:
+        #     raise UserError(_('You have already imported that file.'))
         return statement_ids, notifications
 
     @api.model
@@ -388,15 +390,15 @@ class AccountBankStatementImport(models.TransientModel):
             else:
                 ignored_line_ids.append(unique_id)
         statement_id = False
-        if len(filtered_st_lines) > 0:
-            # Remove values that won't be used to create records
-            stmt_vals.pop('transactions', None)
-            for line_vals in filtered_st_lines:
-                line_vals.pop('account_number', None)
-            # Create the statement
-            stmt_vals['line_ids'] = [
-                [0, False, line] for line in filtered_st_lines]
-            statement_id = bs_model.create(stmt_vals).id
+        #if len(filtered_st_lines) > 0:
+        # Remove values that won't be used to create records
+        stmt_vals.pop('transactions', None)
+        for line_vals in filtered_st_lines:
+            line_vals.pop('account_number', None)
+        # Create the statement
+        stmt_vals['line_ids'] = [
+            [0, False, line] for line in filtered_st_lines]
+        statement_id = bs_model.create(stmt_vals).id
         # Prepare import feedback
         notifications = []
         num_ignored = len(ignored_line_ids)
